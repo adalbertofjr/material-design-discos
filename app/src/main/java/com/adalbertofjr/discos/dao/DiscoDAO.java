@@ -1,6 +1,7 @@
 package com.adalbertofjr.discos.dao;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -18,8 +19,8 @@ public class DiscoDAO {
     private DiscoDbHelper mDbHelper;
     private SQLiteDatabase mDb;
 
-    public DiscoDAO(DiscoDbHelper mDbHelper) {
-        this.mDbHelper = mDbHelper;
+    public DiscoDAO(Context context) {
+        this.mDbHelper = new DiscoDbHelper(context.getApplicationContext());
     }
 
     private SQLiteDatabase getDb() {
@@ -97,7 +98,7 @@ public class DiscoDAO {
 
         SQLiteDatabase db = getDb();
 
-        Cursor cursorDiscos = db.rawQuery("SELECT * FORM " + DiscoContract.TABLE_DISCO +
+        Cursor cursorDiscos = db.rawQuery("SELECT * FROM " + DiscoContract.TABLE_DISCO +
                 " ORDER BY " + DiscoContract.COL_ANO, null);
 
         while (cursorDiscos.moveToNext()) {

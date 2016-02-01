@@ -2,4 +2,6 @@
     <string name="app_name">Discos</string>
     <string name="formacao">Formação</string>
     <string name="musicas">Músicas</string>
+    <string name="tab_todos">Todos os Álbuns</string>
+    <string name="tab_favoritos">Favoritos</string>
 </resources>
