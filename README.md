@@ -6,10 +6,8 @@ Discos é um APP desenvolvido baseado no exemplo do capitulo 26 do livro Dominan
 Imagens
 ======================
 <img  src="https://raw.githubusercontent.com/adalbertofjr/material-design-discos/master/images-git/lista_discos.png" width="203" height="339" />
-
 <img  src="https://raw.githubusercontent.com/adalbertofjr/material-design-discos/master/images-git/detalhe_discos.png" width="203" height="339" />
-
-<img  src="https://raw.githubusercontent.com/adalbertofjr/material-design-discos/master/images-git/detalhe_discos_land.png" width="203" height="339" />
+<img  src="https://raw.githubusercontent.com/adalbertofjr/material-design-discos/master/images-git/detalhe_discos_land.png" width="339" height="203" />
 
 ## Requerimentos ##
 
