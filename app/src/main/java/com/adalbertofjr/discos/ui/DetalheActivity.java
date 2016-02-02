@@ -1,5 +1,8 @@
 package com.adalbertofjr.discos.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -22,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.adalbertofjr.discos.R;
+import com.adalbertofjr.discos.dao.DiscoDAO;
 import com.adalbertofjr.discos.dominio.Disco;
 import com.adalbertofjr.discos.http.DiscoHttp;
 import com.squareup.picasso.Picasso;
@@ -65,6 +69,8 @@ public class DetalheActivity extends AppCompatActivity {
     Toolbar mToolbar;
     Target mPicassoTarget;
 
+    DiscoDAO mDiscoDAO;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +85,52 @@ public class DetalheActivity extends AppCompatActivity {
         carregarCapa(disco);
 
         configurarAnimacaoEntrada();
+
+        mDiscoDAO = new DiscoDAO(this);
+
+        configurarFab(disco);
+    }
+
+    @Override
+    public void onBackPressed() {
+        mFabFavorito.animate().scaleX(0).setListener(
+                new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        DetalheActivity.super.onBackPressed();
+                    }
+                }
+        ).start();
+    }
+
+    private void configurarFab(final Disco disco) {
+        boolean favorito = mDiscoDAO.favorito(disco);
+        mFabFavorito.setImageDrawable(getFabIcone(favorito));
+        mFabFavorito.setBackgroundTintList(getFabBackground(favorito));
+        mFabFavorito.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean favorito = mDiscoDAO.favorito(disco);
+                if (favorito) {
+                    mDiscoDAO.excluir(disco);
+                } else {
+                    mDiscoDAO.inserir(disco);
+                }
+                mFabFavorito.setImageDrawable(getFabIcone(!favorito));
+                mFabFavorito.setBackgroundTintList(getFabBackground(!favorito));
+            }
+        });
+    }
+
+    private ColorStateList getFabBackground(boolean favorito) {
+        return getResources().getColorStateList(favorito
+                ? R.color.bg_fab_cancel : R.color.bg_fab_favorito);
+    }
+
+    private Drawable getFabIcone(boolean favorito) {
+        return getResources().getDrawable(favorito
+        ? R.drawable.ic_cancel : R.drawable.ic_check);
     }
 
     private void configurarAnimacaoEntrada() {
@@ -166,17 +218,17 @@ public class DetalheActivity extends AppCompatActivity {
                 int lightMutedColor = palette.getLightMutedColor(Color.WHITE);
 
                 mTxtTitulo.setTextColor(vibrantColor);
-                if (mAppBar != null){
+                if (mAppBar != null) {
                     mAppBar.setBackgroundColor(vibrantColor);
-                }else {
+                } else {
                     mToolbar.setBackgroundColor(Color.TRANSPARENT);
                 }
 
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     getWindow().setNavigationBarColor(darkMutedColor);
                 }
 
-                if(mCollapsingToolbarLayout != null){
+                if (mCollapsingToolbarLayout != null) {
                     mCollapsingToolbarLayout.setContentScrimColor(darkVibrantColor);
                 }
 

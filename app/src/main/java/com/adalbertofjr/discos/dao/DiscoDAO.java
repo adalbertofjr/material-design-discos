@@ -35,7 +35,7 @@ public class DiscoDAO {
     }
 
     public void inserir(Disco disco) {
-        SQLiteDatabase db = getDb();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         try {
             ContentValues cv = new ContentValues();
             cv.put(DiscoContract.COL_TITULO, disco.titulo);
@@ -54,7 +54,6 @@ public class DiscoDAO {
                     cv.put(DiscoContract.COL_INTEGRANTE, integrante);
                     db.insert(DiscoContract.TABLE_INTEGRANTES, null, cv);
                 }
-
                 int musicaNum = 1;
                 for (String musica : disco.faixas) {
                     cv.clear();
@@ -62,7 +61,6 @@ public class DiscoDAO {
                     cv.put(DiscoContract.COL_MUSICA_NUM, musicaNum);
                     cv.put(DiscoContract.COL_MUSICA, musica);
                     db.insert(DiscoContract.TABLE_MUSICAS, null, cv);
-                    musicaNum++;
                 }
                 db.setTransactionSuccessful();
             }
@@ -74,12 +72,12 @@ public class DiscoDAO {
 
     public boolean favorito(Disco disco) {
         boolean existe;
-        SQLiteDatabase db = getDb();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Cursor c = db.rawQuery("SELECT " + DiscoContract.COL_DISCO_ID +
-                "FROM  " + DiscoContract.TABLE_DISCO + "WHERE " +
-                DiscoContract.COL_TITULO + " =?", new String[]{disco.titulo});
-
+        Cursor c = db.rawQuery("SELECT " + DiscoContract._ID +
+                        " FROM " + DiscoContract.TABLE_DISCO +
+                        " WHERE " + DiscoContract.COL_TITULO + " = ?",
+                new String[]{disco.titulo});
         existe = c.getCount() > 0;
         db.close();
 
@@ -119,10 +117,10 @@ public class DiscoDAO {
 
             //Integrantes
             Cursor cursorFormacao = db.rawQuery("SELECT * FROM " +
-                    DiscoContract.TABLE_INTEGRANTES + "WHERE "
-                    + DiscoContract.COL_DISCO_ID + "=?", new String[]{String.valueOf(id)});
+                    DiscoContract.TABLE_INTEGRANTES + " WHERE "
+                    + DiscoContract.COL_INTEGRANTE_DISCO_ID + " = ? ", new String[]{String.valueOf(id)});
 
-            String[] integrantes = new String[cursorDiscos.getCount()];
+            String[] integrantes = new String[cursorFormacao.getCount()];
             int i = 0;
             while (cursorFormacao.moveToNext()) {
                 integrantes[i] = cursorFormacao.getString(
@@ -136,7 +134,7 @@ public class DiscoDAO {
             //Musicas
             Cursor cursorMusicas = db.rawQuery("SELECT * FROM " +
                     DiscoContract.TABLE_MUSICAS + " WHERE "
-                    + DiscoContract.COL_DISCO_ID + "= ? " +
+                    + DiscoContract.COL_MUSICA_DISCO_ID + "= ? " +
                     "ORDER BY " + DiscoContract.COL_MUSICA_NUM, new String[]{String.valueOf(id)});
 
             String[] musicas = new String[cursorMusicas.getCount()];
