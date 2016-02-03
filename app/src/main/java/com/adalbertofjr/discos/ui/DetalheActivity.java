@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -106,7 +108,7 @@ public class DetalheActivity extends AppCompatActivity {
         ).start();
     }
 
-    private void configurarFab(final Disco  disco) {
+    private void configurarFab(final Disco disco) {
         boolean favorito = mDiscoDAO.favorito(disco);
         mFabFavorito.setImageDrawable(getFabIcone(favorito));
         mFabFavorito.setBackgroundTintList(getFabBackground(favorito));
@@ -121,9 +123,22 @@ public class DetalheActivity extends AppCompatActivity {
                 }
                 mFabFavorito.setImageDrawable(getFabIcone(!favorito));
                 mFabFavorito.setBackgroundTintList(getFabBackground(!favorito));
+                animar(!favorito);
                 ((DiscoApp) getApplication()).getBus().post(new DiscoEvento(disco));
             }
         });
+    }
+
+    private void animar(boolean favorito) {
+        mFabFavorito.setBackgroundTintList(getFabBackground(favorito));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AnimatedVectorDrawable avd = (AnimatedVectorDrawable)
+                    getFabIcone(!favorito);
+            mFabFavorito.setImageDrawable(avd);
+            avd.start();
+        } else {
+            mFabFavorito.setImageDrawable(getFabIcone(favorito));
+        }
     }
 
     private ColorStateList getFabBackground(boolean favorito) {
@@ -132,8 +147,15 @@ public class DetalheActivity extends AppCompatActivity {
     }
 
     private Drawable getFabIcone(boolean favorito) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return ResourcesCompat.getDrawable(
+                    getResources(),
+                    favorito ? R.drawable.ic_cancel_anim : R.drawable.ic_check_anim,
+                    getTheme());
+        }
+
         return getResources().getDrawable(favorito
-        ? R.drawable.ic_cancel : R.drawable.ic_check);
+                ? R.drawable.ic_cancel : R.drawable.ic_check);
     }
 
     private void configurarAnimacaoEntrada() {
