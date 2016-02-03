@@ -21,7 +21,11 @@ import com.adalbertofjr.discos.R;
 import com.adalbertofjr.discos.adapter.DiscoAdapter;
 import com.adalbertofjr.discos.dao.DiscoDAO;
 import com.adalbertofjr.discos.dominio.Disco;
+import com.adalbertofjr.discos.evento.DiscoEvento;
+import com.adalbertofjr.discos.singleton.DiscoApp;
 import com.adalbertofjr.discos.ui.DetalheActivity;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -39,11 +43,14 @@ public class ListaDiscosFavoritosFragment extends Fragment implements DiscoAdapt
 
     DiscoDAO mDiscoDAO;
     List<Disco> mDiscos;
+    Bus mBus;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        mBus = ((DiscoApp) getActivity().getApplication()).getBus();
+        mBus.register(this);
     }
 
     @Nullable
@@ -65,6 +72,13 @@ public class ListaDiscosFavoritosFragment extends Fragment implements DiscoAdapt
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBus.unregister(this);
+        mBus = null;
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
@@ -77,9 +91,9 @@ public class ListaDiscosFavoritosFragment extends Fragment implements DiscoAdapt
         if (mDiscos == null) {
             mDiscos = mDiscoDAO.getDiscos();
         }
-
         atualizarLista();
     }
+
 
     private void atualizarLista() {
         Disco[] array = new Disco[mDiscos.size()];
@@ -87,6 +101,12 @@ public class ListaDiscosFavoritosFragment extends Fragment implements DiscoAdapt
         DiscoAdapter adapter = new DiscoAdapter(getActivity(), array);
         adapter.setAoClicarNoDiscoListener(this);
         mRecyclerView.setAdapter(adapter);
+    }
+
+    @Subscribe
+    public void atualizarLista(DiscoEvento evento) {
+        mDiscos = mDiscoDAO.getDiscos();
+        atualizarLista();
     }
 
     @Override

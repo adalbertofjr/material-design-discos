@@ -27,7 +27,9 @@ import android.widget.TextView;
 import com.adalbertofjr.discos.R;
 import com.adalbertofjr.discos.dao.DiscoDAO;
 import com.adalbertofjr.discos.dominio.Disco;
+import com.adalbertofjr.discos.evento.DiscoEvento;
 import com.adalbertofjr.discos.http.DiscoHttp;
+import com.adalbertofjr.discos.singleton.DiscoApp;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -104,7 +106,7 @@ public class DetalheActivity extends AppCompatActivity {
         ).start();
     }
 
-    private void configurarFab(final Disco disco) {
+    private void configurarFab(final Disco  disco) {
         boolean favorito = mDiscoDAO.favorito(disco);
         mFabFavorito.setImageDrawable(getFabIcone(favorito));
         mFabFavorito.setBackgroundTintList(getFabBackground(favorito));
@@ -119,6 +121,7 @@ public class DetalheActivity extends AppCompatActivity {
                 }
                 mFabFavorito.setImageDrawable(getFabIcone(!favorito));
                 mFabFavorito.setBackgroundTintList(getFabBackground(!favorito));
+                ((DiscoApp) getApplication()).getBus().post(new DiscoEvento(disco));
             }
         });
     }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.adalbertofjr.discos.data.DiscoContract;
 import com.adalbertofjr.discos.data.DiscoDbHelper;
@@ -16,22 +17,12 @@ import java.util.List;
  * Created by AdalbertoF on 01/02/2016.
  */
 public class DiscoDAO {
+    private static final String LOG_TAG = DiscoDAO.class.getSimpleName();
     private DiscoDbHelper mDbHelper;
     private SQLiteDatabase mDb;
 
     public DiscoDAO(Context context) {
         this.mDbHelper = new DiscoDbHelper(context.getApplicationContext());
-    }
-
-    private SQLiteDatabase getDb() {
-        if (mDb == null) {
-            mDb = mDbHelper.getWritableDatabase();
-        }
-        return mDb;
-    }
-
-    private void closeDb() {
-        mDb.close();
     }
 
     public void inserir(Disco disco) {
@@ -45,6 +36,7 @@ public class DiscoDAO {
             cv.put(DiscoContract.COL_CAPA_BIG, disco.capaGrande);
 
             db.beginTransaction();
+
             long idDisco = db.insert(DiscoContract.TABLE_DISCO, null, cv);
 
             if (idDisco != -1) {
@@ -64,6 +56,8 @@ public class DiscoDAO {
                 }
                 db.setTransactionSuccessful();
             }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Inserir: " + e.getMessage());
         } finally {
             db.endTransaction();
         }
@@ -72,20 +66,20 @@ public class DiscoDAO {
 
     public boolean favorito(Disco disco) {
         boolean existe;
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        Cursor c = db.rawQuery("SELECT " + DiscoContract._ID +
+        Cursor c = db.rawQuery("SELECT " + DiscoContract.COL_DISCO_ID +
                         " FROM " + DiscoContract.TABLE_DISCO +
                         " WHERE " + DiscoContract.COL_TITULO + " = ?",
                 new String[]{disco.titulo});
         existe = c.getCount() > 0;
+        c.close();
         db.close();
-
         return existe;
     }
 
     public void excluir(Disco disco) {
-        SQLiteDatabase db = getDb();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(DiscoContract.TABLE_DISCO, DiscoContract.COL_TITULO + "=?",
                 new String[]{disco.titulo});
         db.close();
@@ -94,9 +88,10 @@ public class DiscoDAO {
     public List<Disco> getDiscos() {
         List<Disco> discos = new ArrayList<>();
 
-        SQLiteDatabase db = getDb();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Cursor cursorDiscos = null;
 
-        Cursor cursorDiscos = db.rawQuery("SELECT * FROM " + DiscoContract.TABLE_DISCO +
+        cursorDiscos = db.rawQuery("SELECT * FROM " + DiscoContract.TABLE_DISCO +
                 " ORDER BY " + DiscoContract.COL_ANO, null);
 
         while (cursorDiscos.moveToNext()) {
@@ -139,7 +134,7 @@ public class DiscoDAO {
 
             String[] musicas = new String[cursorMusicas.getCount()];
             i = 0;
-            while (cursorFormacao.moveToNext()) {
+            while (cursorMusicas.moveToNext()) {
                 musicas[i] = cursorMusicas.getString(
                         cursorMusicas.getColumnIndex(DiscoContract.COL_MUSICA));
                 i++;
@@ -149,8 +144,10 @@ public class DiscoDAO {
             cursorMusicas.close();
             discos.add(disco);
         }
+
         cursorDiscos.close();
         db.close();
+
         return discos;
     }
 }

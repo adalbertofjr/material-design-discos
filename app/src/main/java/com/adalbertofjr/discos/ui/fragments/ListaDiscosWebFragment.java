@@ -22,7 +22,10 @@ import com.adalbertofjr.discos.R;
 import com.adalbertofjr.discos.adapter.DiscoAdapter;
 import com.adalbertofjr.discos.dominio.Disco;
 import com.adalbertofjr.discos.http.DiscoHttp;
+import com.adalbertofjr.discos.singleton.DiscoApp;
 import com.adalbertofjr.discos.ui.DetalheActivity;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -70,6 +73,11 @@ public class ListaDiscosWebFragment extends Fragment implements DiscoAdapter.AoC
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
