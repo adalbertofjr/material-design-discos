@@ -21,6 +21,7 @@ Imagens
 
 Lista das libraries / compiles utiizadas no projeto:
 
+* org.hamcrest:hamcrest-library:1.3
 * com.android.support:appcompat-v7:23.1.1
 * com.google.code.gson:gson:2.5
 * com.squareup.okhttp:okhttp:2.7.2
@@ -30,4 +31,8 @@ Lista das libraries / compiles utiizadas no projeto:
 * com.android.support:cardview-v7:23.1.1
 * com.android.support:design:23.1.1
 * com.android.support:palette-v7:23.1.1
-* compile 'com.squareup:otto:1.3.8'
+* compile 'com.squareup:otto:1.3.8
+* com.android.support.test:runner:0.4
+* com.android.support.test:rules:0.3
+* org.hamcrest:hamcrest-integration:1.3
+* com.android.support:support-annotations:23.1.0

@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DiscoDbHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "discosDB";
+    public static final String DATABASE_NAME = "discosDB";
     private static final int DB_VERSION = 1;
 
     public DiscoDbHelper(Context context) {
